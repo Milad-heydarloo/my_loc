@@ -117,6 +117,14 @@
 //     );
 //   }
 // }
+
+
+
+
+
+
+
+//ll
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:geolocator/geolocator.dart';
@@ -144,6 +152,7 @@ class LocationPickerScreen extends StatefulWidget {
 
 class _LocationPickerScreenState extends State<LocationPickerScreen> {
   Position? _currentPosition;
+  final MapController _mapController = MapController();
 
   @override
   void initState() {
@@ -156,7 +165,6 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
     bool serviceEnabled;
     LocationPermission permission;
 
-    // تست فعال بودن سرویس موقعیت‌یابی
     serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
       return Future.error('Location services are disabled.');
@@ -178,6 +186,7 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
     Position position = await Geolocator.getCurrentPosition();
     setState(() {
       _currentPosition = position;
+      _mapController.move(LatLng(position.latitude, position.longitude), 14.0);
     });
     print("Current location: ${position.latitude}, ${position.longitude}");
   }
@@ -186,11 +195,13 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
     Geolocator.getPositionStream(
       locationSettings: const LocationSettings(
         accuracy: LocationAccuracy.high,
-        distanceFilter: 1, // تغییرات به ازای هر متر
+        distanceFilter: 1,
       ),
     ).listen((Position position) {
       setState(() {
         _currentPosition = position;
+        _mapController.move(
+            LatLng(position.latitude, position.longitude), _mapController.zoom);
       });
       print("Updated location: ${position.latitude}, ${position.longitude}");
     });
@@ -205,6 +216,7 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
       body: _currentPosition == null
           ? const Center(child: CircularProgressIndicator())
           : FlutterMap(
+              mapController: _mapController,
               options: MapOptions(
                 center: LatLng(
                     _currentPosition!.latitude, _currentPosition!.longitude),
