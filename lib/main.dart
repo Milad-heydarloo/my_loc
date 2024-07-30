@@ -452,7 +452,7 @@ class LocationPickerScreen extends StatefulWidget {
 class _LocationPickerScreenState extends State<LocationPickerScreen> {
   Position? _currentPosition;
   late MapController _mapController;
-  double _zoom = 15.0;
+  double _zoom = 18;
 
   @override
   void initState() {
@@ -507,14 +507,14 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
 
   void _zoomIn() {
     setState(() {
-      _zoom = (_zoom + 1).clamp(5.0, 18.0);
+      _zoom = (_zoom + 1).clamp(9, 18);
       _mapController.move(_mapController.center, _zoom);
     });
   }
 
   void _zoomOut() {
     setState(() {
-      _zoom = (_zoom - 1).clamp(5.0, 18.0);
+      _zoom = (_zoom - 1).clamp(9, 18);
       _mapController.move(_mapController.center, _zoom);
     });
   }
@@ -543,11 +543,11 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
               : FlutterMap(
             mapController: _mapController,
             options: MapOptions(
-              center: LatLng(
+              initialCenter: LatLng(
                   _currentPosition!.latitude, _currentPosition!.longitude),
-              zoom: _zoom,
-              minZoom: 5.0,
-              maxZoom: 18.0,
+              initialZoom: _zoom,
+              minZoom: 8,
+              maxZoom: 18,
             ),
             children: [
               TileLayer(
