@@ -324,7 +324,9 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
       print("Updated location: ${position.latitude}, ${position.longitude}");
     });
   }
-late String apikey='eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImp0aSI6ImMzNjVkMDg2NjdmMzgxZDY1ZmI2NzU0ODcwNDJmZTQ1M2I1MzgxODEyMWY5YTE2OTIwNjFlNDY2NDA2MmNlYzE0NjZmNzIzZDEzMzk4NTk1In0.eyJhdWQiOiIyODIxMyIsImp0aSI6ImMzNjVkMDg2NjdmMzgxZDY1ZmI2NzU0ODcwNDJmZTQ1M2I1MzgxODEyMWY5YTE2OTIwNjFlNDY2NDA2MmNlYzE0NjZmNzIzZDEzMzk4NTk1IiwiaWF0IjoxNzIxOTQwODg3LCJuYmYiOjE3MjE5NDA4ODcsImV4cCI6MTcyNDUzMjg4Nywic3ViIjoiIiwic2NvcGVzIjpbImJhc2ljIl19.P-HVICCEemigM5vv_lYuxVogPRp3_Tpa1-6zJWONRJ9BfsWXKd4B6FPgnxmJg1wkSGOXc_GFFoeZuFrf9nRfJzwdofkbFbI9yrtWWMATW2PIY8zjd_2SoZ4O94HE-AfyPOO4Dq_V7TJV1xiGinIJdyFCCfMBAuxN-2p8etP5UF2R6r9gDqxXpeVXiHbDx2zB9nTpONG_rlCi26SJ4Y63rDhsAOppdW6v0bP8bF7wkcOJ_z2lwzaWpcOnvJ0uP0cnYc_y9MiINw_P0g79MWMV-ntFNaaj_LU5G_kvSb9y0uWbmFrPgLoEgRFkdkRK2OEAORd9b5ux_iJGnkYV39UHPQ';
+
+  late String apikey =
+      'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImp0aSI6ImMzNjVkMDg2NjdmMzgxZDY1ZmI2NzU0ODcwNDJmZTQ1M2I1MzgxODEyMWY5YTE2OTIwNjFlNDY2NDA2MmNlYzE0NjZmNzIzZDEzMzk4NTk1In0.eyJhdWQiOiIyODIxMyIsImp0aSI6ImMzNjVkMDg2NjdmMzgxZDY1ZmI2NzU0ODcwNDJmZTQ1M2I1MzgxODEyMWY5YTE2OTIwNjFlNDY2NDA2MmNlYzE0NjZmNzIzZDEzMzk4NTk1IiwiaWF0IjoxNzIxOTQwODg3LCJuYmYiOjE3MjE5NDA4ODcsImV4cCI6MTcyNDUzMjg4Nywic3ViIjoiIiwic2NvcGVzIjpbImJhc2ljIl19.P-HVICCEemigM5vv_lYuxVogPRp3_Tpa1-6zJWONRJ9BfsWXKd4B6FPgnxmJg1wkSGOXc_GFFoeZuFrf9nRfJzwdofkbFbI9yrtWWMATW2PIY8zjd_2SoZ4O94HE-AfyPOO4Dq_V7TJV1xiGinIJdyFCCfMBAuxN-2p8etP5UF2R6r9gDqxXpeVXiHbDx2zB9nTpONG_rlCi26SJ4Y63rDhsAOppdW6v0bP8bF7wkcOJ_z2lwzaWpcOnvJ0uP0cnYc_y9MiINw_P0g79MWMV-ntFNaaj_LU5G_kvSb9y0uWbmFrPgLoEgRFkdkRK2OEAORd9b5ux_iJGnkYV39UHPQ';
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -334,34 +336,34 @@ late String apikey='eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImp0aSI6ImMzNjVkMDg2Njdm
       body: _currentPosition == null
           ? const Center(child: CircularProgressIndicator())
           : FlutterMap(
-        options: MapOptions(
-          initialCenter: LatLng(
-              _currentPosition!.latitude, _currentPosition!.longitude),
-          initialZoom: 9,
-        ),
-        children: [
-          TileLayer(
-              urlTemplate:
-              "https://map.ir/shiveh/xyz/1.0.0/Shiveh:Shiveh@EPSG:3857@png/{z}/{x}/{y}.png"
-                  "?x-api-key=${apikey}"),
-          MarkerLayer(
-            markers: [
-            Marker(
-                width: 80.0,
-                height: 80.0,
-                point: LatLng(_currentPosition!.latitude,
-                    _currentPosition!.longitude),
-                child:   Icon(
-                  Icons.location_pin,
-                  size: 50.0,
-                  color: Colors.blue,
-                ),
-                key: Key(_currentPosition.toString()),
+              options: MapOptions(
+                initialCenter: LatLng(
+                    _currentPosition!.latitude, _currentPosition!.longitude),
+                initialZoom: 18.0,
               ),
-            ],
-          ),
-        ],
-      ),
+              children: [
+                TileLayer(
+                    urlTemplate:
+                        "https://map.ir/shiveh/xyz/1.0.0/Shiveh:Shiveh@EPSG:3857@png/{z}/{x}/{y}.png"
+                        "?x-api-key=${apikey}"),
+                MarkerLayer(
+                  markers: [
+                    Marker(
+                      width: 80.0,
+                      height: 80.0,
+                      point: LatLng(_currentPosition!.latitude,
+                          _currentPosition!.longitude),
+                      child: Icon(
+                        Icons.location_pin,
+                        size: 50.0,
+                        color: Colors.blue,
+                      ),
+                      key: Key(_currentPosition.toString()),
+                    ),
+                  ],
+                ),
+              ],
+            ),
     );
   }
 }
