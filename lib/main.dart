@@ -334,33 +334,35 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
       body: _currentPosition == null
           ? const Center(child: CircularProgressIndicator())
           : FlutterMap(
-              options: MapOptions(
-                initialCenter: LatLng(
-                    _currentPosition!.latitude, _currentPosition!.longitude),
-                initialZoom: 9.0,
+        options: MapOptions(
+          center: LatLng(
+              _currentPosition!.latitude, _currentPosition!.longitude),
+          zoom: 15.0,
+        ),
+        children: [
+          TileLayer(
+            urlTemplate:
+            "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+            subdomains: ['a', 'b', 'c'],
+          ),
+          MarkerLayer(
+            markers: [
+            Marker(
+                width: 80.0,
+                height: 80.0,
+                point: LatLng(_currentPosition!.latitude,
+                    _currentPosition!.longitude),
+                child:   Icon(
+                  Icons.location_pin,
+                  size: 50.0,
+                  color: Colors.red,
+                ),
+                key: Key(_currentPosition.toString()),
               ),
-              children: [
-                TileLayer(
-                  urlTemplate:
-                      "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-                  subdomains: ['a', 'b', 'c'],
-                ),
-                MarkerLayer(
-                  markers: [
-                    Marker(
-                      width: 80.0,
-                      height: 80.0,
-                      point: LatLng(_currentPosition!.latitude,
-                          _currentPosition!.longitude),
-                      child: Icon(
-                        Icons.location_city,
-                        size: 30,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 }
