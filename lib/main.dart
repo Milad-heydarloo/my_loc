@@ -274,10 +274,13 @@ class LocationPickerScreen extends StatefulWidget {
 
 class _LocationPickerScreenState extends State<LocationPickerScreen> {
   Position? _currentPosition;
+  late MapController _mapController;
+  double _zoom = 15.0;
 
   @override
   void initState() {
     super.initState();
+    _mapController = MapController();
     _getCurrentLocation();
     _startLocationUpdates();
   }
@@ -325,45 +328,95 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
     });
   }
 
+  void _zoomIn() {
+    setState(() {
+      _zoom = _zoom + 1;
+      _mapController.move(_mapController.center, _zoom);
+    });
+  }
+
+  void _zoomOut() {
+    setState(() {
+      _zoom = _zoom - 1;
+      _mapController.move(_mapController.center, _zoom);
+    });
+  }
+
+  void _showCurrentLocation() {
+    if (_currentPosition != null) {
+      _mapController.move(
+          LatLng(_currentPosition!.latitude, _currentPosition!.longitude),
+          _zoom);
+    }
+  }
+
   late String apikey =
       'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImp0aSI6ImMzNjVkMDg2NjdmMzgxZDY1ZmI2NzU0ODcwNDJmZTQ1M2I1MzgxODEyMWY5YTE2OTIwNjFlNDY2NDA2MmNlYzE0NjZmNzIzZDEzMzk4NTk1In0.eyJhdWQiOiIyODIxMyIsImp0aSI6ImMzNjVkMDg2NjdmMzgxZDY1ZmI2NzU0ODcwNDJmZTQ1M2I1MzgxODEyMWY5YTE2OTIwNjFlNDY2NDA2MmNlYzE0NjZmNzIzZDEzMzk4NTk1IiwiaWF0IjoxNzIxOTQwODg3LCJuYmYiOjE3MjE5NDA4ODcsImV4cCI6MTcyNDUzMjg4Nywic3ViIjoiIiwic2NvcGVzIjpbImJhc2ljIl19.P-HVICCEemigM5vv_lYuxVogPRp3_Tpa1-6zJWONRJ9BfsWXKd4B6FPgnxmJg1wkSGOXc_GFFoeZuFrf9nRfJzwdofkbFbI9yrtWWMATW2PIY8zjd_2SoZ4O94HE-AfyPOO4Dq_V7TJV1xiGinIJdyFCCfMBAuxN-2p8etP5UF2R6r9gDqxXpeVXiHbDx2zB9nTpONG_rlCi26SJ4Y63rDhsAOppdW6v0bP8bF7wkcOJ_z2lwzaWpcOnvJ0uP0cnYc_y9MiINw_P0g79MWMV-ntFNaaj_LU5G_kvSb9y0uWbmFrPgLoEgRFkdkRK2OEAORd9b5ux_iJGnkYV39UHPQ';
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Flutter Location Picker'),
       ),
-      body: _currentPosition == null
-          ? const Center(child: CircularProgressIndicator())
-          : FlutterMap(
-              options: MapOptions(
-                initialCenter: LatLng(
-                    _currentPosition!.latitude, _currentPosition!.longitude),
-                initialZoom: 18.0,
-              ),
-              children: [
-                TileLayer(
-                    urlTemplate:
-                        "https://map.ir/shiveh/xyz/1.0.0/Shiveh:Shiveh@EPSG:3857@png/{z}/{x}/{y}.png"
-                        "?x-api-key=${apikey}"),
-                MarkerLayer(
-                  markers: [
-                    Marker(
-                      width: 80.0,
-                      height: 80.0,
-                      point: LatLng(_currentPosition!.latitude,
-                          _currentPosition!.longitude),
-                      child: Icon(
-                        Icons.location_pin,
-                        size: 50.0,
-                        color: Colors.blue,
-                      ),
-                      key: Key(_currentPosition.toString()),
+      body: Stack(
+        children: [
+          _currentPosition == null
+              ? const Center(child: CircularProgressIndicator())
+              : FlutterMap(
+                  mapController: _mapController,
+                  options: MapOptions(
+                    center: LatLng(_currentPosition!.latitude,
+                        _currentPosition!.longitude),
+                    zoom: _zoom,
+                  ),
+                  children: [
+                    TileLayer(
+                      urlTemplate:
+                          "https://map.ir/shiveh/xyz/1.0.0/Shiveh:Shiveh@EPSG:3857@png/{z}/{x}/{y}.png?x-api-key=${apikey}",
+                    ),
+                    MarkerLayer(
+                      markers: [
+                        Marker(
+                          width: 80.0,
+                          height: 80.0,
+                          point: LatLng(_currentPosition!.latitude,
+                              _currentPosition!.longitude),
+                          child: Icon(
+                            Icons.location_pin,
+                            size: 50.0,
+                            color: Colors.blue,
+                          ),
+                          key: Key(_currentPosition.toString()),
+                        ),
+                      ],
                     ),
                   ],
                 ),
+          Positioned(
+            bottom: 50,
+            right: 10,
+            child: Column(
+              children: [
+                FloatingActionButton(
+                  onPressed: _zoomIn,
+                  child: const Icon(Icons.zoom_in),
+                ),
+                const SizedBox(height: 10),
+                FloatingActionButton(
+                  onPressed: _zoomOut,
+                  child: const Icon(Icons.zoom_out),
+                ),
+                const SizedBox(height: 10),
+                FloatingActionButton(
+                  onPressed: _showCurrentLocation,
+                  child: const Icon(Icons.my_location),
+                ),
               ],
             ),
+          ),
+        ],
+      ),
     );
   }
 }
