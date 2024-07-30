@@ -24,7 +24,6 @@ class LocationPickerScreen extends StatefulWidget {
 
 class _LocationPickerScreenState extends State<LocationPickerScreen> {
   Position? _currentPosition;
-  TextEditingController _locationController = TextEditingController();
 
   @override
   void initState() {
@@ -59,7 +58,6 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
     Position position = await Geolocator.getCurrentPosition();
     setState(() {
       _currentPosition = position;
-      _locationController.text = 'Lat: ${position.latitude}, Lon: ${position.longitude}';
     });
     print("Current location: ${position.latitude}, ${position.longitude}");
   }
@@ -73,7 +71,6 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
     ).listen((Position position) {
       setState(() {
         _currentPosition = position;
-        _locationController.text = 'Lat: ${position.latitude}, Lon: ${position.longitude}';
       });
       print("Updated location: ${position.latitude}, ${position.longitude}");
     });
@@ -85,52 +82,35 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
       appBar: AppBar(
         title: const Text('Flutter Location Picker'),
       ),
-      body: Column(
-        children: [
-          Expanded(
-            child: _currentPosition == null
-                ? const Center(child: CircularProgressIndicator())
-                : FlutterLocationPicker(
-                    initZoom: 11,
-                    minZoomLevel: 5,
-                    maxZoomLevel: 16,
-                    trackMyPosition: true,
-                    searchBarBackgroundColor: Colors.white,
-                    selectedLocationButtonTextstyle: const TextStyle(fontSize: 18),
-                    mapLanguage: 'en',
-                    onError: (e) => print(e),
-                    selectLocationButtonLeadingIcon: const Icon(Icons.check),
-                    onPicked: (pickedData) {
-                      print(pickedData.latLong.latitude);
-                      print(pickedData.latLong.longitude);
-                      print(pickedData.address);
-                      print(pickedData.addressData);
-                    },
-                    onChanged: (pickedData) {
-                      print(pickedData.latLong.latitude);
-                      print(pickedData.latLong.longitude);
-                      print(pickedData.address);
-                      print(pickedData.addressData);
-                    },
-                    showContributorBadgeForOSM: true,
-                    initPosition: LatLong(
-                      _currentPosition!.latitude,
-                      _currentPosition!.longitude,
-                    ),
-                  ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: TextField(
-              controller: _locationController,
-              readOnly: true,
-              decoration: InputDecoration(
-                labelText: 'Current Location',
-                border: OutlineInputBorder(),
-              ),
-            ),
-          ),
-        ],
+      body: _currentPosition == null
+          ? const Center(child: CircularProgressIndicator())
+          : FlutterLocationPicker(
+        initZoom: 11,
+        minZoomLevel: 5,
+        maxZoomLevel: 16,
+        trackMyPosition: true,
+        searchBarBackgroundColor: Colors.white,
+        selectedLocationButtonTextstyle: const TextStyle(fontSize: 18),
+        mapLanguage: 'en',
+        onError: (e) => print(e),
+        selectLocationButtonLeadingIcon: const Icon(Icons.check),
+        onPicked: (pickedData) {
+          print(pickedData.latLong.latitude);
+          print(pickedData.latLong.longitude);
+          print(pickedData.address);
+          print(pickedData.addressData);
+        },
+        onChanged: (pickedData) {
+          print(pickedData.latLong.latitude);
+          print(pickedData.latLong.longitude);
+          print(pickedData.address);
+          print(pickedData.addressData);
+        },
+        showContributorBadgeForOSM: true,
+        initPosition: LatLong(
+          _currentPosition!.latitude,
+          _currentPosition!.longitude,
+        ),
       ),
     );
   }
