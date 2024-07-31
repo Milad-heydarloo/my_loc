@@ -34,9 +34,9 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
 
   // لیست مکان‌ها
   List<LatLng> locations = [
-    LatLng(35.6892, 51.3890), // Tehran
-    LatLng(36.2605, 59.6168), // Mashhad
-    LatLng(29.5918, 52.5836), // Shiraz
+    LatLng(35.70601, 51.40525), // Tehran
+    LatLng(35.70654, 51.40560), // Mashhad
+    LatLng(35.70386, 51.40457), // Shiraz
     // هر مکان دیگری که می‌خواهید اضافه کنید
   ];
 
