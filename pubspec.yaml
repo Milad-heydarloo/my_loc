@@ -56,6 +56,7 @@ dev_dependencies:
   latlong2: ^0.9.0
   pocketbase: ^0.18.1
   get: ^4.5.1
+  url_launcher: ^6.0.20
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 

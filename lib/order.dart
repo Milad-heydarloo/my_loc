@@ -163,6 +163,7 @@ class ProductB {
   final String number;
   final String description;
   final String datead;
+  final bool expectation;
   final bool okbuy;
   final bool hurry;
   final bool official;
@@ -177,6 +178,7 @@ class ProductB {
       required this.dataclearing,
       required this.number,
       required this.description,
+      required this.expectation,
       required this.datead,
       required this.okbuy,
       required this.hurry,
@@ -195,6 +197,7 @@ class ProductB {
       number: json['number'].toString(),
       description: json['description'].toString(),
       datead: json['datead'].toString(),
+      expectation: json['expectation'],
       okbuy: json['okbuy'],
       hurry: json['hurry'],
       official: json['official'],

@@ -4,6 +4,7 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:get/get.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 void main() => runApp(const MyApp());
 
@@ -22,9 +23,29 @@ class MyApp extends StatelessWidget {
 
 class LocationModel {
   final LatLng position;
-  final String name;
+  final String title;
+  final String companyname;
+  final String phonenumber;
+  final String mobilenumber;
+  final String address;
+  final String number;
+  final bool okbuy;
+  final bool hurry;
+  final bool expectation;
 
-  LocationModel({required this.position, required this.name});
+  LocationModel(
+      {required this.title,
+      required this.position,
+      required this.companyname,
+      required this.phonenumber,
+      required this.mobilenumber,
+      required this.address,
+      required this.number,
+      required this.okbuy,
+      required this.hurry,
+      required this.expectation,
+
+      });
 }
 
 class LocationPickerScreen extends StatefulWidget {
@@ -42,7 +63,6 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
 // لیست مکان‌ها با نام‌ها
   List<LocationModel> locations = [];
 
-  
   @override
   void initState() {
     super.initState();
@@ -78,9 +98,16 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
             // ساخت LocationModel جدید و اضافه کردن آن به لیست جدید
             newLocations.add(
               LocationModel(
-                position: LatLng(latitude, longitude),
-                name: supplier.companyname,
-              ),
+                  title: product.title,
+                  hurry: product.hurry,
+                  okbuy: product.okbuy,
+                  expectation:product.expectation,
+                  position: LatLng(latitude, longitude),
+                  companyname: supplier.companyname,
+                  address: supplier.address,
+                  mobilenumber: supplier.mobilenumber,
+                  number: product.number,
+                  phonenumber: supplier.phonenumber),
             );
           }
         }
@@ -202,6 +229,7 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
         title: const Text('Flutter Location Picker'),
       ),
       body: Stack(
+
         children: [
           _currentPosition == null
               ? const Center(child: CircularProgressIndicator())
@@ -244,24 +272,27 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
                                     locationModel); // فراخوانی تابع برای نمایش دیالوگ
                               },
                               child: Column(
+                        // Align children to the start
                                 children: [
-                                  Card(
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Text(
-                                        locationModel.name, // نام مکان از مدل
-                                        style: TextStyle(fontSize: 14),
+                                  Expanded( // Wrap Card with Expanded
+                                    child: Card(
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Text(
+                                          locationModel.companyname, // نام مکان از مدل
+                                          style: TextStyle(fontSize: 14,fontWeight: FontWeight.bold),
+                                        ),
                                       ),
                                     ),
                                   ),
                                   Icon(
                                     Icons.location_pin,
                                     size: 50.0,
-                                    color: Colors
-                                        .red, // می‌توانید رنگ دیگری انتخاب کنید
+                                    color: Colors.red, // می‌توانید رنگ دیگری انتخاب کنید
                                   ),
                                 ],
                               ),
+
                             ),
                           );
                         }).toList(),
@@ -298,9 +329,123 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
 
   void _showLocationDialog(LocationModel locationModel) {
     Get.defaultDialog(
-      title: locationModel.name, // نمایش نام مکان به عنوان عنوان دیالوگ
-      middleText:
-          "You selected the location at \nLatitude: ${locationModel.position.latitude}\nLongitude: ${locationModel.position.longitude}",
+      title: locationModel.companyname, // نمایش نام مکان به عنوان عنوان دیالوگ
+      content: Directionality(textDirection: TextDirection.rtl, child:   SingleChildScrollView(child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // نمایش عنوان
+          Text(
+            "نام کالا  : ${locationModel.title}",
+            style: TextStyle(fontSize: 16),
+          ),
+          SizedBox(height: 10),
+
+          // نمایش آدرس
+          Text(
+            " تعداد کالا  جهت دریافت : ${locationModel.number}",
+            style: TextStyle(fontSize: 16),
+          ),
+          SizedBox(height: 10),
+
+          // نمایش آدرس
+          Text(
+            " آدرس : ${locationModel.address}",
+            style: TextStyle(fontSize: 16),
+          ),
+          SizedBox(height: 10),
+          // نمایش شماره تماس
+          Row(
+            children: [
+              IconButton(
+                icon: Icon(Icons.phone),
+                onPressed: () {
+                  _makePhoneCall(locationModel.phonenumber); // فراخوانی تابع برای تماس با شماره
+                },
+              ),
+              Text(
+                locationModel.phonenumber,
+                style: TextStyle(fontSize: 16),
+              ),
+            ],
+          ),
+          SizedBox(height: 10),
+
+          // نمایش شماره موبایل
+          Row(
+            children: [
+              IconButton(
+                icon: Icon(Icons.phone_android),
+                onPressed: () {
+                  _makePhoneCall(locationModel.mobilenumber); // فراخوانی تابع برای تماس با شماره موبایل
+                },
+              ),
+              Text(
+                locationModel.mobilenumber,
+                style: TextStyle(fontSize: 16),
+              ),
+            ],
+          ),
+          SizedBox(height: 10),
+
+          // نمایش وضعیت hurry
+          Row(
+            children: [
+              Icon(
+                Icons.circle,
+                color: locationModel.hurry ? Colors.blue : Colors.grey,
+              ),
+              SizedBox(width: 5),
+              Text(
+                "عجله دار",
+                style: TextStyle(
+                  fontSize: 16,
+                  color: locationModel.hurry ? Colors.blue : Colors.grey,
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 10),
+
+          // نمایش وضعیت okbuy
+          Row(
+            children: [
+              Icon(
+                Icons.circle,
+                color: locationModel.okbuy ? Colors.green : Colors.grey,
+              ),
+              SizedBox(width: 5),
+              Text(
+                " رزرو شده جهت دریافت ",
+                style: TextStyle(
+                  fontSize: 16,
+                  color: locationModel.okbuy ? Colors.green : Colors.grey,
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 10),
+
+          // نمایش اطلاعات جغرافیایی
+
+
+          // سویچ برای expectation
+          Row(
+            children: [
+              Text(
+                " دریافت شد کالا ؟ :",
+                style: TextStyle(fontSize: 16),
+              ),
+              Switch(
+                value: locationModel.expectation,
+                onChanged: (value) {
+
+                  Get.defaultDialog(title: 'sd',middleText: 'sdc');
+                },
+              ),
+            ],
+          ),
+        ],
+      ),)),
       confirm: ElevatedButton(
         onPressed: () {
           Get.back(); // بستن دیالوگ
@@ -309,4 +454,18 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
       ),
     );
   }
+
+// تابع برای تماس گرفتن
+  void _makePhoneCall(String phoneNumber) async {
+    final Uri launchUri = Uri(
+      scheme: 'tel',
+      path: phoneNumber,
+    );
+    if (await canLaunch(launchUri.toString())) {
+      await launch(launchUri.toString());
+    } else {
+      throw 'Could not launch $phoneNumber';
+    }
+  }
+
 }
