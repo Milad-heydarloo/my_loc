@@ -22,137 +22,6 @@ class OrderController extends GetxController {
 
   final String collectionName = 'location';
 
-  List<Location> allOrders = []; // جایگزین RxList با لیست معمولی
-
-  late bool isLoading; // استفاده از bool معمولی برای بارگذاری
-  void insializ() async {
-    isLoading = true;
-    update(['hi']);
-   // await fetchAllOrders();
-    await fetchAllProducts();
-   // await fetchSelectedGarrantyItems();
-    isLoading = false;
-    update(['hi']);
-  }
-
-  late Timer _timer; // تایمر برای به روز رسانی هر 10 ثانیه
-
-  @override
-  void onInit() {
-    super.onInit();
-    insializ();
-    startAutoRefresh(); // شروع به به روز رسانی خودکار در زمان شروع
-  }
-
-  @override
-  void onClose() {
-    super.onClose();
-    _timer.cancel(); // لغو تایمر در زمان بستن کنترلر
-  }
-
-  void startAutoRefresh() {
-    _timer = Timer.periodic(Duration(seconds: 20), (timer) {
-      print('start' + DateTime.now().toString());
-     // _fetchAndUpdate(); // صدا زدن متد fetchAllOrders هر 10 ثانیه
-    });
-  }
-
-
-  String currentFilter = '';
-  String currentSearch = '';
-  String currentSort = '';
-  String currentPrivate = '';
-
-  Future<List<Location>> _fetchOrders() async {
-    // String filterQuery = 'type = "18zn54v3u6vfaqd"';
-
-    String filterQuery = '';
-    if (currentPrivate.isNotEmpty) {
-      filterQuery += 'type = "$currentPrivate"';
-    }
-    if (currentSearch.isNotEmpty) {
-      filterQuery +=
-          (filterQuery.isNotEmpty ? ' && ' : '') + 'title ~ "$currentSearch"';
-    }
-    if (currentFilter.isNotEmpty) {
-      filterQuery += (filterQuery.isNotEmpty ? ' && ' : '') + currentFilter;
-    }
-
-    int page = 1;
-    List<Location> orders = [];
-
-    try {
-      while (true) {
-        final resultList = await _pb.collection(collectionName).getList(
-          page: page,
-          perPage: 50,
-          filter: filterQuery.isNotEmpty ? filterQuery : null,
-          sort: currentSort.isNotEmpty ? currentSort : null,
-          expand: 'listproducta,listproductb',
-        );
-
-        if (resultList.items.isEmpty) {
-          break;
-        }
-
-        for (var orderJson in resultList.items) {
-          Map<String, dynamic> orderData = orderJson.toJson();
-          List<ProductA> listProductA =
-              (orderData['expand']?['listproducta'] as List<dynamic>?)
-                  ?.map((product) =>
-                  ProductA.fromJson(Map<String, dynamic>.from(product)))
-                  .toList() ??
-                  [];
-          List<ProductB> listProductB =
-              (orderData['expand']?['listproductb'] as List<dynamic>?)
-                  ?.map((product) =>
-                  ProductB.fromJson(Map<String, dynamic>.from(product)))
-                  .toList() ??
-                  [];
-          Location order = Location.fromJson(
-              Map<String, dynamic>.from(orderData), listProductA, listProductB);
-          orders.add(order);
-        }
-
-        page++;
-      }
-    } catch (error) {
-      print('Error fetching orders: $error');
-    }
-
-    return orders;
-  }
-
-
-  //////////////
-  List<Product> selectedProductItems = [];
-
-  Future<List<Product>> fetchAllProducts() async {
-    List<Product> allProducts = [];
-    int page = 1;
-    int perPage = 50; // تعداد محصولات در هر صفحه
-
-    while (true) {
-      final resultList = await _pb.collection('listproductb').getList(
-        page: page,
-        perPage: perPage,
-      );
-
-      List<Product> pageItems = resultList.items
-          .map((item) => Product.fromJson(item.toJson()))
-          .toList();
-      if (pageItems.isEmpty) {
-        break; // اگر صفحه خالی باشد، خارج می‌شویم
-      }
-      selectedProductItems.addAll(pageItems);
-      page++;
-    }
-    print('object');
-    update(['product']);
-    return allProducts;
-  }
-
-
 
   Future<void> updateLocation(Location location) async {
     try {
@@ -222,99 +91,7 @@ class OrderController extends GetxController {
 }
 
 /////////////////////////////////////////////////
-class ProductA {
-  final String id;
-  final String title;
-  final List<String> garranty;
-  late final String saleprice;
-  final String number;
-  final String purchaseprice;
-  final String description;
-  late final bool unavailable;
-  late final String percent;
 
-  ProductA({
-    required this.id,
-    required this.title,
-    required this.garranty,
-    required this.saleprice,
-    required this.number,
-    required this.purchaseprice,
-    required this.description,
-    required this.unavailable,
-    required this.percent,
-  });
-
-  factory ProductA.fromJson(Map<String, dynamic> json) {
-    return ProductA(
-      id: json['id'] as String,
-      title: json['title'] as String,
-      garranty:
-      (json['garranty'] as List<dynamic>).map((e) => e as String).toList(),
-      saleprice: json['saleprice'] as String,
-      // تبدیل مقدار به String
-      number: json['number'] as String,
-      purchaseprice: json['purchaseprice'] as String,
-      description: json['description'] as String,
-
-      unavailable: json['unavailable'],
-      percent: json['percent'] as String,
-    );
-  }
-}
-
-//0
-// class Order {
-//   final String id;
-//   final String title;
-//   final String callnumber;
-//   final List<ProductA> listProductA;
-//   final List<ProductB> listProductB;
-//   final String datenow;
-//   final String datead;
-//   final String address;
-//   final String niyaz;
-//   final String phonenumberit;
-//   final String buy;
-//   final String winner;
-//   final String created;
-//
-//   Order({
-//     required this.id,
-//     required this.title,
-//     required this.callnumber,
-//     required this.listProductA,
-//     required this.listProductB,
-//     required this.datenow,
-//     required this.datead,
-//     required this.address,
-//     required this.niyaz,
-//     required this.phonenumberit,
-//     required this.buy,
-//     required this.winner,
-//     required this.created,
-//   });
-//
-//   factory Order.fromJson(Map<String, dynamic> json, List<ProductA> productsA,
-//       List<ProductB> productsB) {
-//     return Order(
-//       id: json['id'].toString(),
-//       title: json['title'].toString(),
-//       callnumber: json['callnumber'].toString(),
-//       listProductA: productsA,
-//       listProductB: productsB,
-//       phonenumberit: json['phonenumberit'].toString(),
-//       datenow: json['datenow'].toString(),
-//       datead: json['datead'].toString(),
-//       address: json['address'].toString(),
-//       niyaz: json['niyaz'].toString(),
-//       buy: json['buy'].toString(),
-//       winner: json['winner'].toString(),
-//       created: json['created'].toString(),
-//     );
-//   }
-// }
-//1
 class Location {
   final String id;
   final String user;
@@ -328,7 +105,7 @@ class Location {
     required this.longitude,
   });
 
-  factory Location.fromJson(Map<String, dynamic> json, List<ProductA> productsA,
+  factory Location.fromJson(Map<String, dynamic> json, List<Location> productsA,
       List<ProductB> productsB) {
     return Location(
       id: json['id'].toString(),
@@ -388,22 +165,3 @@ class ProductB {
   }
 }
 
-class Garranty {
-  final String garranty;
-
-  Garranty({required this.garranty});
-
-  factory Garranty.fromJson(Map<String, dynamic> json) {
-    return Garranty(garranty: json['Garrantyname'].toString());
-  }
-}
-
-class Product {
-  final String nameproduct;
-
-  Product({required this.nameproduct});
-
-  factory Product.fromJson(Map<String, dynamic> json) {
-    return Product(nameproduct: json['nameproduct'].toString());
-  }
-}
