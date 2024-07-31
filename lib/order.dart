@@ -202,15 +202,15 @@ class OrderController extends GetxController {
     } catch (e) {
       // emit(OrderError(e.toString()));
       Get.snackbar(
-        'اطلاعات سفارش برنده',
-        'با خطا مواجه شد',
+        'لطفا اینترنت',
+        'تلفن همراه خود را چک کنید',
         backgroundColor: Colors.red,
         messageText: Text(
-          'با خطا مواجه شد',
+         'تلفن همراه خود را چک کنید',
           textDirection: TextDirection.rtl,
         ),
         titleText: Text(
-          'اطلاعات سفارش برنده',
+     'لطفا اینترنت',
           textDirection: TextDirection.rtl,
         ),
       );
