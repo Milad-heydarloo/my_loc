@@ -19,7 +19,12 @@ class MyApp extends StatelessWidget {
     );
   }
 }
+class LocationModel {
+  final LatLng position;
+  final String name;
 
+  LocationModel({required this.position, required this.name});
+}
 class LocationPickerScreen extends StatefulWidget {
   @override
   _LocationPickerScreenState createState() => _LocationPickerScreenState();
@@ -32,12 +37,12 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
 
   final OrderController orderController = Get.put(OrderController());
 
-  // لیست مکان‌ها
-  List<LatLng> locations = [
-    LatLng(35.70601, 51.40525), // Tehran
-    LatLng(35.70654, 51.40560), // Mashhad
-    LatLng(35.70386, 51.40457), // Shiraz
-    // هر مکان دیگری که می‌خواهید اضافه کنید
+// لیست مکان‌ها با نام‌ها
+  List<LocationModel> locations = [
+    LocationModel(position: LatLng(35.70601, 51.40525), name: "Tehran"),
+    LocationModel(position: LatLng(35.70654, 51.40560), name: "Mashhad"),
+    LocationModel(position: LatLng(35.70386, 51.40457), name: "Shiraz"),
+    // مکان‌های دیگر را در صورت نیاز اضافه کنید
   ];
 
   @override
@@ -124,7 +129,7 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
     // تمام موقعیت‌های مورد نظر از جمله موقعیت فعلی
     final allLocations = [
       LatLng(_currentPosition!.latitude, _currentPosition!.longitude),
-      ...locations,
+      ...locations.map((locationModel) => locationModel.position),
     ];
 
     // محاسبه باندینگ باکس که تمام موقعیت‌ها را پوشش دهد
@@ -186,17 +191,37 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
                           ),
                           key: Key(_currentPosition.toString()),
                         ),
-                        ...locations.map((location) => Marker(
-                              width: 80.0,
-                              height: 80.0,
-                              point: location,
-                              child: Icon(
-                                Icons.location_pin,
-                                size: 50.0,
-                                color: Colors
-                                    .red, // می‌توانید رنگ دیگری انتخاب کنید
+                        ...locations.map((locationModel) {
+                          return Marker(
+                            width: 150.0,
+                            height: 100.0,
+                            point: locationModel.position,
+                            child: GestureDetector(
+                              onTap: () {
+                                _showLocationDialog(locationModel); // فراخوانی تابع برای نمایش دیالوگ
+                              },
+                              child: Column(
+                                children: [
+                                  Card(
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Text(
+                                        locationModel.name, // نام مکان از مدل
+                                        style: TextStyle(fontSize: 14),
+                                      ),
+                                    ),
+                                  ),
+                                  Icon(
+                                    Icons.location_pin,
+                                    size: 50.0,
+                                    color: Colors.red, // می‌توانید رنگ دیگری انتخاب کنید
+                                  ),
+                                ],
                               ),
-                            )),
+                            ),
+                          );
+                        }).toList(),
+
                       ],
                     ),
                   ],
@@ -227,4 +252,17 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
       ),
     );
   }
+  void _showLocationDialog(LocationModel locationModel) {
+    Get.defaultDialog(
+      title: locationModel.name, // نمایش نام مکان به عنوان عنوان دیالوگ
+      middleText: "You selected the location at \nLatitude: ${locationModel.position.latitude}\nLongitude: ${locationModel.position.longitude}",
+      confirm: ElevatedButton(
+        onPressed: () {
+          Get.back(); // بستن دیالوگ
+        },
+        child: Text("OK"),
+      ),
+    );
+  }
+
 }
