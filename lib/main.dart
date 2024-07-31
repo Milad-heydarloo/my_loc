@@ -134,7 +134,7 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
     _mapController.fitBounds(
       bounds,
       options: FitBoundsOptions(
-        padding: EdgeInsets.all(20.0), // حاشیه‌ای که می‌خواهید در اطراف نقشه بگذارید
+        padding: EdgeInsets.all(50.0), // حاشیه‌ای که می‌خواهید در اطراف نقشه بگذارید
       ),
     );
   }
