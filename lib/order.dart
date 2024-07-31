@@ -85,11 +85,13 @@ class OrderController extends GetxController {
     int page = 1;
     List<ProductB> products = [];
 
+
     try {
       while (true) {
         final resultList = await _pb.collection('listproductb').getList(
           page: page,
           perPage: 50,
+
           expand: 'supplier', // گسترش اطلاعات تامین‌کننده
         );
 

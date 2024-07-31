@@ -263,35 +263,48 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
                         ),
                         ...locations.map((locationModel) {
                           return Marker(
-                            width: 150.0,
-                            height: 100.0,
+                            width: 200,
+                            height: 150,
                             point: locationModel.position,
                             child: GestureDetector(
                               onTap: () {
                                 _showLocationDialog(
                                     locationModel); // فراخوانی تابع برای نمایش دیالوگ
                               },
-                              child: Column(
-                        // Align children to the start
+                              child: Directionality(textDirection: TextDirection.rtl, child: Column(
+
                                 children: [
-                                  Expanded( // Wrap Card with Expanded
-                                    child: Card(
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: Text(
-                                          locationModel.companyname, // نام مکان از مدل
-                                          style: TextStyle(fontSize: 14,fontWeight: FontWeight.bold),
-                                        ),
+                                  Card(
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Row(
+
+                                        children: [
+                                          Icon(
+                                            Icons.circle,
+                                            color: locationModel.hurry ? Colors.blue : Colors.grey,
+                                            size: 20,
+                                          ),
+                                          SizedBox(width: 2),
+                                          Text(
+                                            locationModel.companyname,
+                                            style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                                          ),
+
+
+                                        ],
                                       ),
                                     ),
                                   ),
+                                  SizedBox(height: 10), // اضافه کردن فاصله مناسب
                                   Icon(
                                     Icons.location_pin,
                                     size: 50.0,
-                                    color: Colors.red, // می‌توانید رنگ دیگری انتخاب کنید
+                                    color: Colors.red,
                                   ),
                                 ],
-                              ),
+                              ),)
+
 
                             ),
                           );
