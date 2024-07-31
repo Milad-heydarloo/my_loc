@@ -19,12 +19,14 @@ class MyApp extends StatelessWidget {
     );
   }
 }
+
 class LocationModel {
   final LatLng position;
   final String name;
 
   LocationModel({required this.position, required this.name});
 }
+
 class LocationPickerScreen extends StatefulWidget {
   @override
   _LocationPickerScreenState createState() => _LocationPickerScreenState();
@@ -38,13 +40,9 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
   final OrderController orderController = Get.put(OrderController());
 
 // لیست مکان‌ها با نام‌ها
-  List<LocationModel> locations = [
-    LocationModel(position: LatLng(35.70601, 51.40525), name: "Tehran"),
-    LocationModel(position: LatLng(35.70654, 51.40560), name: "Mashhad"),
-    LocationModel(position: LatLng(35.70386, 51.40457), name: "Shiraz"),
-    // مکان‌های دیگر را در صورت نیاز اضافه کنید
-  ];
+  List<LocationModel> locations = [];
 
+  
   @override
   void initState() {
     super.initState();
@@ -54,6 +52,47 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
   }
 
   void _getCurrentLocation() async {
+    List<ProductB> products = await orderController.FetchProducts();
+    List<LocationModel> newLocations = [];
+
+    for (var product in products) {
+      print('Product Title: ${product.title}');
+
+      // بررسی وجود تامین‌کنندگان و استخراج اطلاعات آن‌ها
+      if (product.supplier.isNotEmpty) {
+        for (var supplier in product.supplier) {
+          print('Supplier ID: ${supplier.id}');
+          print('Company Name: ${supplier.companyname}');
+          print('Phone Number: ${supplier.phonenumber}');
+          print('Mobile Number: ${supplier.mobilenumber}');
+          print('Address: ${supplier.address}');
+          print('Location: ${supplier.location}');
+
+          // جدا کردن مقدار طول و عرض جغرافیایی
+          List<String> locationParts = supplier.location.split(',');
+
+          if (locationParts.length == 2) {
+            double latitude = double.parse(locationParts[0]);
+            double longitude = double.parse(locationParts[1]);
+
+            // ساخت LocationModel جدید و اضافه کردن آن به لیست جدید
+            newLocations.add(
+              LocationModel(
+                position: LatLng(latitude, longitude),
+                name: supplier.companyname,
+              ),
+            );
+          }
+        }
+      } else {
+        print('No suppliers available for this product.');
+      }
+    }
+
+    setState(() {
+      locations = newLocations; // جایگزینی لیست ثابت با لیست جدید
+    });
+
     bool serviceEnabled;
     LocationPermission permission;
 
@@ -123,6 +162,7 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
           _zoom);
     }
   }
+
   void _focusOnMarkers() {
     if (_currentPosition == null) return;
 
@@ -139,7 +179,8 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
     _mapController.fitBounds(
       bounds,
       options: FitBoundsOptions(
-        padding: EdgeInsets.all(50.0), // حاشیه‌ای که می‌خواهید در اطراف نقشه بگذارید
+        padding:
+            EdgeInsets.all(50.0), // حاشیه‌ای که می‌خواهید در اطراف نقشه بگذارید
       ),
     );
   }
@@ -154,7 +195,8 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
         actions: [
           IconButton(
             icon: Icon(Icons.map),
-            onPressed: _focusOnMarkers, // فراخوانی تابع برای تمرکز بر روی مارکرها
+            onPressed:
+                _focusOnMarkers, // فراخوانی تابع برای تمرکز بر روی مارکرها
           ),
         ],
         title: const Text('Flutter Location Picker'),
@@ -198,7 +240,8 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
                             point: locationModel.position,
                             child: GestureDetector(
                               onTap: () {
-                                _showLocationDialog(locationModel); // فراخوانی تابع برای نمایش دیالوگ
+                                _showLocationDialog(
+                                    locationModel); // فراخوانی تابع برای نمایش دیالوگ
                               },
                               child: Column(
                                 children: [
@@ -214,14 +257,14 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
                                   Icon(
                                     Icons.location_pin,
                                     size: 50.0,
-                                    color: Colors.red, // می‌توانید رنگ دیگری انتخاب کنید
+                                    color: Colors
+                                        .red, // می‌توانید رنگ دیگری انتخاب کنید
                                   ),
                                 ],
                               ),
                             ),
                           );
                         }).toList(),
-
                       ],
                     ),
                   ],
@@ -252,10 +295,12 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
       ),
     );
   }
+
   void _showLocationDialog(LocationModel locationModel) {
     Get.defaultDialog(
       title: locationModel.name, // نمایش نام مکان به عنوان عنوان دیالوگ
-      middleText: "You selected the location at \nLatitude: ${locationModel.position.latitude}\nLongitude: ${locationModel.position.longitude}",
+      middleText:
+          "You selected the location at \nLatitude: ${locationModel.position.latitude}\nLongitude: ${locationModel.position.longitude}",
       confirm: ElevatedButton(
         onPressed: () {
           Get.back(); // بستن دیالوگ
@@ -264,5 +309,4 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
       ),
     );
   }
-
 }
