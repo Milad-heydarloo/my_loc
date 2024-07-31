@@ -16,7 +16,7 @@ class OrderController extends GetxController {
   final PocketBase _pb = PocketBase(
     const String.fromEnvironment('order',
         defaultValue: 'https://saater.liara.run'),
-    lang: const String.fromEnvironment('order', defaultValue: 'en-US'),
+    lang: const String.fromEnvironment('listproductb', defaultValue: 'en-US'),
     httpClientFactory: kIsWeb ? () => getClient() : null,
   );
 
@@ -30,7 +30,7 @@ class OrderController extends GetxController {
     update(['hi']);
    // await fetchAllOrders();
     await fetchAllProducts();
-    await fetchSelectedGarrantyItems();
+   // await fetchSelectedGarrantyItems();
     isLoading = false;
     update(['hi']);
   }
@@ -133,7 +133,7 @@ class OrderController extends GetxController {
     int perPage = 50; // تعداد محصولات در هر صفحه
 
     while (true) {
-      final resultList = await _pb.collection('product').getList(
+      final resultList = await _pb.collection('listproductb').getList(
         page: page,
         perPage: perPage,
       );
@@ -152,28 +152,6 @@ class OrderController extends GetxController {
     return allProducts;
   }
 
-  /////////////
-  List<Garranty> selectedGarrantyItems = [];
-
-  Future<void> fetchSelectedGarrantyItems() async {
-    try {
-      final resultList = await _pb.collection('garrantya').getList();
-      print('dddd' + resultList.items.toString());
-      List<Garranty> garrantyItems = [];
-      print(garrantyItems.length);
-      for (var item in resultList.items) {
-        final data = item.toJson();
-        if (data.containsKey('Garrantyname')) {
-          print(item.collectionName.toString());
-          garrantyItems.add(Garranty.fromJson(data));
-        }
-      }
-      selectedGarrantyItems = garrantyItems;
-      update(['garrantya']);
-    } catch (error) {
-      print('Error fetching selected garranty items: $error');
-    }
-  }
 
 
   Future<void> updateLocation(Location location) async {
