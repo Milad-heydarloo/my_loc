@@ -186,42 +186,39 @@ class OrderController extends GetxController {
       final record =
       await _pb.collection(collectionName).update(location.id, body: body);
       if (record != null) {
-      //  _fetchAndUpdate();
 
         // Get.snackbar(
-        //     'اطلاعات سفارش برنده' ,  ' با موفقیت وارد شد',backgroundColor: Colors.green,);
-        Get.snackbar(
-          'اطلاعات سفارش برنده',
-          'با موفقیت وارد شد',
-          backgroundColor: Colors.green,
-          messageText: Text(
-            'با موفقیت وارد شد',
-            textDirection: TextDirection.rtl,
-          ),
-          titleText: Text(
-            'اطلاعات سفارش برنده',
-            textDirection: TextDirection.rtl,
-          ),
-        );
+        //   'اطلاعات سفارش برنده',
+        //   'با موفقیت وارد شد',
+        //   backgroundColor: Colors.green,
+        //   messageText: Text(
+        //     'با موفقیت وارد شد',
+        //     textDirection: TextDirection.rtl,
+        //   ),
+        //   titleText: Text(
+        //     'اطلاعات سفارش برنده',
+        //     textDirection: TextDirection.rtl,
+        //   ),
+        // );
 
 
         // add(FetchOrders());
         // emit(OrderSuccess('Order updated successfully'));
       } else {
         // emit(OrderError('Failed to update order.'));
-        Get.snackbar(
-          'اطلاعات سفارش برنده',
-          'با خطا مواجه شد',
-          backgroundColor: Colors.red,
-          messageText: Text(
-            'با خطا مواجه شد',
-            textDirection: TextDirection.rtl,
-          ),
-          titleText: Text(
-            'اطلاعات سفارش برنده',
-            textDirection: TextDirection.rtl,
-          ),
-        );
+        // Get.snackbar(
+        //   'اطلاعات سفارش برنده',
+        //   'با خطا مواجه شد',
+        //   backgroundColor: Colors.red,
+        //   messageText: Text(
+        //     'با خطا مواجه شد',
+        //     textDirection: TextDirection.rtl,
+        //   ),
+        //   titleText: Text(
+        //     'اطلاعات سفارش برنده',
+        //     textDirection: TextDirection.rtl,
+        //   ),
+        // );
 
       }
     } catch (e) {
