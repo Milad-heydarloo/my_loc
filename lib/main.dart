@@ -389,6 +389,15 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
                                       value; // Update the .value of RxBool
                                   orderController.updateProduct(product
                                       .IDProduct); // Update product status
+
+                                  // Check if all products are received
+                                  bool allReceived = locationModel.listPS
+                                      .every((p) => p.expectation.value);
+
+                                  if (allReceived) {
+                                    Navigator.of(context)
+                                        .pop(); // Close the dialog
+                                  }
                                 },
                               ),
                             ],
@@ -402,14 +411,14 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
               ),
             ),
           ),
-          actions: [
-            ElevatedButton(
-              onPressed: () {
-                Navigator.of(context).pop(); // Close the dialog
-              },
-              child: Text("OK"),
-            ),
-          ],
+          // actions: [
+          //   ElevatedButton(
+          //     onPressed: () {
+          //       Navigator.of(context).pop(); // Close the dialog
+          //     },
+          //     child: Text("OK"),
+          //   ),
+          // ],
         ),
       ),
     );

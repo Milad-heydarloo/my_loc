@@ -31,7 +31,7 @@ class OrderController extends GetxController {
   void onInit() {
     super.onInit();
     // شروع تایمر
-    _timer = Timer.periodic(Duration(seconds: 3), (timer) async {
+    _timer = Timer.periodic(Duration(seconds: 15), (timer) async {
       await FetchProductsAndSupplier();
       update(['products']); // به‌روزرسانی GetBuilder با id 'products'
     });
@@ -129,6 +129,7 @@ class OrderController extends GetxController {
             textDirection: TextDirection.rtl,
           ),
         );
+        await FetchProductsAndSupplier();
 
         // add(FetchOrders());
         // emit(OrderSuccess('Order updated successfully'));
@@ -177,7 +178,7 @@ class OrderController extends GetxController {
         final resultList = await _pb.collection('listproductb').getList(
               page: page,
               perPage: 50,
-
+          filter: 'expectation = false && okbuy = true',
               expand: 'supplier', // گسترش اطلاعات تامین‌کننده
             );
 
@@ -283,7 +284,7 @@ class OrderController extends GetxController {
 
     // مقداردهی لیست Datasort
     Datasort = newLocations;
-
+update(['products']);
     return newLocations;
   }
 
