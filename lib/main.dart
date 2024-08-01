@@ -5,6 +5,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:get/get.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:get/get.dart';
 
 void main() => runApp(const MyApp());
 
@@ -14,38 +15,11 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
-      title: 'Flutter Location Picker',
+      title: 'مسول دریافت کالا های در صف دریافت',
       debugShowCheckedModeBanner: false,
       home: LocationPickerScreen(),
     );
   }
-}
-
-class LocationModel {
-  final LatLng position;
-  final String title;
-  final String companyname;
-  final String phonenumber;
-  final String mobilenumber;
-  final String address;
-  final String number;
-  final bool okbuy;
-  final bool hurry;
-  final bool expectation;
-
-  LocationModel(
-      {required this.title,
-      required this.position,
-      required this.companyname,
-      required this.phonenumber,
-      required this.mobilenumber,
-      required this.address,
-      required this.number,
-      required this.okbuy,
-      required this.hurry,
-      required this.expectation,
-
-      });
 }
 
 class LocationPickerScreen extends StatefulWidget {
@@ -61,7 +35,7 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
   final OrderController orderController = Get.put(OrderController());
 
 // لیست مکان‌ها با نام‌ها
-  List<LocationModel> locations = [];
+  List<LocationSupplierModel> locations = [];
 
   @override
   void initState() {
@@ -72,52 +46,11 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
   }
 
   void _getCurrentLocation() async {
-    List<ProductB> products = await orderController.FetchProducts();
-    List<LocationModel> newLocations = [];
-
-    for (var product in products) {
-      print('Product Title: ${product.title}');
-
-      // بررسی وجود تامین‌کنندگان و استخراج اطلاعات آن‌ها
-      if (product.supplier.isNotEmpty) {
-        for (var supplier in product.supplier) {
-          print('Supplier ID: ${supplier.id}');
-          print('Company Name: ${supplier.companyname}');
-          print('Phone Number: ${supplier.phonenumber}');
-          print('Mobile Number: ${supplier.mobilenumber}');
-          print('Address: ${supplier.address}');
-          print('Location: ${supplier.location}');
-
-          // جدا کردن مقدار طول و عرض جغرافیایی
-          List<String> locationParts = supplier.location.split(',');
-
-          if (locationParts.length == 2) {
-            double latitude = double.parse(locationParts[0]);
-            double longitude = double.parse(locationParts[1]);
-
-            // ساخت LocationModel جدید و اضافه کردن آن به لیست جدید
-            newLocations.add(
-              LocationModel(
-                  title: product.title,
-                  hurry: product.hurry,
-                  okbuy: product.okbuy,
-                  expectation:product.expectation,
-                  position: LatLng(latitude, longitude),
-                  companyname: supplier.companyname,
-                  address: supplier.address,
-                  mobilenumber: supplier.mobilenumber,
-                  number: product.number,
-                  phonenumber: supplier.phonenumber),
-            );
-          }
-        }
-      } else {
-        print('No suppliers available for this product.');
-      }
-    }
-
+    await orderController.FetchProductsAndSupplier();
+    locations = await orderController.Datasort;
+    print(locations.length);
     setState(() {
-      locations = newLocations; // جایگزینی لیست ثابت با لیست جدید
+      locations; // جایگزینی لیست ثابت با لیست جدید
     });
 
     bool serviceEnabled;
@@ -218,252 +151,266 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        actions: [
-          IconButton(
-            icon: Icon(Icons.map),
-            onPressed:
-                _focusOnMarkers, // فراخوانی تابع برای تمرکز بر روی مارکرها
-          ),
-        ],
-        title: const Text('Flutter Location Picker'),
-      ),
-      body: Stack(
-
-        children: [
-          _currentPosition == null
-              ? const Center(child: CircularProgressIndicator())
-              : FlutterMap(
-                  mapController: _mapController,
-                  options: MapOptions(
-                    initialCenter: LatLng(_currentPosition!.latitude,
-                        _currentPosition!.longitude),
-                    initialZoom: _zoom,
-                    minZoom: 8,
-                    maxZoom: 18,
-                  ),
-                  children: [
-                    TileLayer(
-                      urlTemplate:
-                          "https://map.ir/shiveh/xyz/1.0.0/Shiveh:Shiveh@EPSG:3857@png/{z}/{x}/{y}.png?x-api-key=${apikey}",
-                    ),
-                    MarkerLayer(
-                      markers: [
-                        Marker(
-                          width: 80.0,
-                          height: 80.0,
-                          point: LatLng(_currentPosition!.latitude,
-                              _currentPosition!.longitude),
-                          child: Icon(
-                            Icons.location_pin,
-                            size: 50.0,
-                            color: Colors.blue,
-                          ),
-                          key: Key(_currentPosition.toString()),
-                        ),
-                        ...locations.map((locationModel) {
-                          return Marker(
-                            width: 200,
-                            height: 150,
-                            point: locationModel.position,
-                            child: GestureDetector(
-                              onTap: () {
-                                _showLocationDialog(
-                                    locationModel); // فراخوانی تابع برای نمایش دیالوگ
-                              },
-                              child: Directionality(textDirection: TextDirection.rtl, child: Column(
-
-                                children: [
-                                  Card(
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Row(
-
-                                        children: [
-                                          Icon(
-                                            Icons.circle,
-                                            color: locationModel.hurry ? Colors.blue : Colors.grey,
-                                            size: 20,
-                                          ),
-                                          SizedBox(width: 2),
-                                          Text(
-                                            locationModel.companyname,
-                                            style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-                                          ),
-
-
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                  SizedBox(height: 10), // اضافه کردن فاصله مناسب
-                                  Icon(
-                                    Icons.location_pin,
-                                    size: 50.0,
-                                    color: Colors.red,
-                                  ),
-                                ],
-                              ),)
-
-
-                            ),
-                          );
-                        }).toList(),
-                      ],
-                    ),
-                  ],
-                ),
-          Positioned(
-            bottom: 50,
-            right: 10,
-            child: Column(
-              children: [
-                FloatingActionButton(
-                  onPressed: _zoomIn,
-                  child: const Icon(Icons.zoom_in),
-                ),
-                const SizedBox(height: 10),
-                FloatingActionButton(
-                  onPressed: _zoomOut,
-                  child: const Icon(Icons.zoom_out),
-                ),
-                const SizedBox(height: 10),
-                FloatingActionButton(
-                  onPressed: _showCurrentLocation,
-                  child: const Icon(Icons.my_location),
-                ),
-              ],
+        appBar: AppBar(
+          actions: [
+            IconButton(
+              icon: Icon(Icons.map),
+              onPressed:
+                  _focusOnMarkers, // فراخوانی تابع برای تمرکز بر روی مارکرها
             ),
-          ),
-        ],
-      ),
-    );
+          ],
+          title: const Text('Flutter Location Picker'),
+        ),
+        body: Stack(
+          children: [
+            GetBuilder<OrderController>(
+              id: 'products',
+              builder: (controller) {
+                if (_currentPosition == null) {
+                  return const Center(child: CircularProgressIndicator());
+                } else {
+                  return FlutterMap(
+                    mapController: _mapController,
+                    options: MapOptions(
+                      initialCenter: LatLng(_currentPosition!.latitude,
+                          _currentPosition!.longitude),
+                      initialZoom: _zoom,
+                      minZoom: 8,
+                      maxZoom: 18,
+                    ),
+                    children: [
+                      TileLayer(
+                        urlTemplate:
+                            "https://map.ir/shiveh/xyz/1.0.0/Shiveh:Shiveh@EPSG:3857@png/{z}/{x}/{y}.png?x-api-key=${apikey}",
+                      ),
+                      MarkerLayer(
+                        markers: [
+                          Marker(
+                            width: 80.0,
+                            height: 80.0,
+                            point: LatLng(_currentPosition!.latitude,
+                                _currentPosition!.longitude),
+                            child: Icon(
+                              Icons.location_pin,
+                              size: 50.0,
+                              color: Colors.blue,
+                            ),
+                            key: Key(_currentPosition.toString()),
+                          ),
+                          ...controller.Datasort.map((locationModel) {
+                            bool hasHurryProduct = locationModel.listPS
+                                .any((product) => product.hurry);
+                            return Marker(
+                              width: 200,
+                              height: 150,
+                              point: locationModel.position,
+                              child: GestureDetector(
+                                onTap: () {
+                                  _showLocationDialog(locationModel);
+                                },
+                                child: Directionality(
+                                  textDirection: TextDirection.rtl,
+                                  child: Column(
+                                    children: [
+                                      Card(
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Row(
+                                            children: [
+                                              Icon(
+                                                Icons.circle,
+                                                color: hasHurryProduct
+                                                    ? Colors.blue
+                                                    : Colors.grey,
+                                                size: 20,
+                                              ),
+                                              SizedBox(width: 2),
+                                              Text(
+                                                locationModel.companyname,
+                                                style: TextStyle(
+                                                    fontSize: 14,
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                      SizedBox(height: 10),
+                                      Icon(
+                                        Icons.location_pin,
+                                        size: 50.0,
+                                        color: Colors.red,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            );
+                          }).toList(),
+                        ],
+                      ),
+                    ],
+                  );
+                }
+              },
+            ),
+            Positioned(
+              bottom: 50,
+              right: 10,
+              child: Column(
+                children: [
+                  FloatingActionButton(
+                    onPressed: _zoomIn,
+                    child: const Icon(Icons.zoom_in),
+                  ),
+                  const SizedBox(height: 10),
+                  FloatingActionButton(
+                    onPressed: _zoomOut,
+                    child: const Icon(Icons.zoom_out),
+                  ),
+                  const SizedBox(height: 10),
+                  FloatingActionButton(
+                    onPressed: _showCurrentLocation,
+                    child: const Icon(Icons.my_location),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ));
   }
 
-  void _showLocationDialog(LocationModel locationModel) {
-    Get.defaultDialog(
-      title: locationModel.companyname, // نمایش نام مکان به عنوان عنوان دیالوگ
-      content: Directionality(textDirection: TextDirection.rtl, child:   SingleChildScrollView(child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // نمایش عنوان
-          Text(
-            "نام کالا  : ${locationModel.title}",
-            style: TextStyle(fontSize: 16),
+  void _showLocationDialog(LocationSupplierModel locationModel) {
+    Get.dialog(
+      Builder(
+        builder: (context) => AlertDialog(
+          title: Center(
+            child: Text(
+              locationModel.companyname,
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
           ),
-          SizedBox(height: 10),
-
-          // نمایش آدرس
-          Text(
-            " تعداد کالا  جهت دریافت : ${locationModel.number}",
-            style: TextStyle(fontSize: 16),
+          content: Directionality(
+            textDirection: TextDirection.rtl,
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SizedBox(height: 10),
+                  Text("آدرس: ${locationModel.address}",
+                      style: TextStyle(fontSize: 16)),
+                  SizedBox(height: 10),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Row(
+                        children: [
+                          IconButton(
+                            icon: Icon(Icons.phone),
+                            onPressed: () {
+                              _makePhoneCall(locationModel.phonenumber);
+                            },
+                          ),
+                          Text(locationModel.phonenumber,
+                              style: TextStyle(fontSize: 16)),
+                        ],
+                      ),
+                      SizedBox(width: 20),
+                      Row(
+                        children: [
+                          IconButton(
+                            icon: Icon(Icons.phone_android),
+                            onPressed: () {
+                              _makePhoneCall(locationModel.mobilenumber);
+                            },
+                          ),
+                          Text(locationModel.mobilenumber,
+                              style: TextStyle(fontSize: 16)),
+                        ],
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 10),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: locationModel.listPS.map((product) {
+                      return Card(child: Column(
+                        children: [
+                          Text("نام کالا: ${product.title}",
+                              style: TextStyle(fontSize: 16)),
+                          SizedBox(height: 5),
+                          Text("تعداد کالا جهت دریافت: ${product.number}",
+                              style: TextStyle(fontSize: 16)),
+                          SizedBox(height: 5),
+                          Row(
+                            children: [
+                              Icon(Icons.circle,
+                                  color: product.hurry
+                                      ? Colors.blue
+                                      : Colors.grey),
+                              SizedBox(width: 5),
+                              Text("عجله دار",
+                                  style: TextStyle(
+                                      fontSize: 16,
+                                      color: product.hurry
+                                          ? Colors.blue
+                                          : Colors.grey)),
+                            ],
+                          ),
+                          SizedBox(height: 5),
+                          Row(
+                            children: [
+                              Icon(Icons.circle,
+                                  color: product.okbuy
+                                      ? Colors.green
+                                      : Colors.grey),
+                              SizedBox(width: 5),
+                              Text("رزرو شده جهت دریافت",
+                                  style: TextStyle(
+                                      fontSize: 16,
+                                      color: product.okbuy
+                                          ? Colors.green
+                                          : Colors.grey)),
+                            ],
+                          ),
+                          SizedBox(height: 10),
+                          Obx(() => Row(
+                            children: [
+                              Text(
+                                "دریافت شد کالا ؟ :",
+                                style: TextStyle(fontSize: 16),
+                              ),
+                              Switch(
+                                value: product.expectation.value,
+                                // Access the .value of RxBool
+                                onChanged: (value) {
+                                  product.expectation.value =
+                                      value; // Update the .value of RxBool
+                                  orderController.updateProduct(product
+                                      .IDProduct); // Update product status
+                                },
+                              ),
+                            ],
+                          )),
+                          Divider(),
+                        ],
+                      ),);
+                    }).toList(),
+                  ),
+                ],
+              ),
+            ),
           ),
-          SizedBox(height: 10),
-
-          // نمایش آدرس
-          Text(
-            " آدرس : ${locationModel.address}",
-            style: TextStyle(fontSize: 16),
-          ),
-          SizedBox(height: 10),
-          // نمایش شماره تماس
-          Row(
-            children: [
-              IconButton(
-                icon: Icon(Icons.phone),
-                onPressed: () {
-                  _makePhoneCall(locationModel.phonenumber); // فراخوانی تابع برای تماس با شماره
-                },
-              ),
-              Text(
-                locationModel.phonenumber,
-                style: TextStyle(fontSize: 16),
-              ),
-            ],
-          ),
-          SizedBox(height: 10),
-
-          // نمایش شماره موبایل
-          Row(
-            children: [
-              IconButton(
-                icon: Icon(Icons.phone_android),
-                onPressed: () {
-                  _makePhoneCall(locationModel.mobilenumber); // فراخوانی تابع برای تماس با شماره موبایل
-                },
-              ),
-              Text(
-                locationModel.mobilenumber,
-                style: TextStyle(fontSize: 16),
-              ),
-            ],
-          ),
-          SizedBox(height: 10),
-
-          // نمایش وضعیت hurry
-          Row(
-            children: [
-              Icon(
-                Icons.circle,
-                color: locationModel.hurry ? Colors.blue : Colors.grey,
-              ),
-              SizedBox(width: 5),
-              Text(
-                "عجله دار",
-                style: TextStyle(
-                  fontSize: 16,
-                  color: locationModel.hurry ? Colors.blue : Colors.grey,
-                ),
-              ),
-            ],
-          ),
-          SizedBox(height: 10),
-
-          // نمایش وضعیت okbuy
-          Row(
-            children: [
-              Icon(
-                Icons.circle,
-                color: locationModel.okbuy ? Colors.green : Colors.grey,
-              ),
-              SizedBox(width: 5),
-              Text(
-                " رزرو شده جهت دریافت ",
-                style: TextStyle(
-                  fontSize: 16,
-                  color: locationModel.okbuy ? Colors.green : Colors.grey,
-                ),
-              ),
-            ],
-          ),
-          SizedBox(height: 10),
-
-          // نمایش اطلاعات جغرافیایی
-
-
-          // سویچ برای expectation
-          Row(
-            children: [
-              Text(
-                " دریافت شد کالا ؟ :",
-                style: TextStyle(fontSize: 16),
-              ),
-              Switch(
-                value: locationModel.expectation,
-                onChanged: (value) {
-
-                  Get.defaultDialog(title: 'sd',middleText: 'sdc');
-                },
-              ),
-            ],
-          ),
-        ],
-      ),)),
-      confirm: ElevatedButton(
-        onPressed: () {
-          Get.back(); // بستن دیالوگ
-        },
-        child: Text("OK"),
+          actions: [
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+              child: Text("OK"),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -480,5 +427,9 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
       throw 'Could not launch $phoneNumber';
     }
   }
-
 }
+
+//
+// _currentPosition == null
+// ? const Center(child: CircularProgressIndicator())
+// :
