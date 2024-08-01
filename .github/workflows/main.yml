@@ -1,0 +1,51 @@
+name: Flutter Build
+
+on:
+  push:
+    branches:
+      - main  # یا هر برنچی که می‌خواهید اجرا شود
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.3.0'  # یا هر ورژن فلاتری که استفاده می‌کنید
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Build Android
+        run: flutter build apk --release
+
+      - name: Build iOS
+        run: |
+          flutter build ios --release --no-codesign
+
+      - name: Build Web
+        run: flutter build web --release
+
+      - name: Upload Android APK
+        uses: actions/upload-artifact@v2
+        with:
+          name: android-apk
+          path: build/app/outputs/flutter-apk/app-release.apk
+
+      - name: Upload iOS Archive
+        uses: actions/upload-artifact@v2
+        with:
+          name: ios-archive
+          path: build/ios/iphoneos/Runner.app
+
+      - name: Upload Web Build
+        uses: actions/upload-artifact@v2
+        with:
+          name: web-build
+          path: build/web
