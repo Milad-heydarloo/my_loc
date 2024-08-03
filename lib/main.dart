@@ -55,14 +55,16 @@ void callbackDispatcher() {
       final PocketBase pb = PocketBase(
         const String.fromEnvironment('order',
             defaultValue: 'https://saater.liara.run'),
-        lang: const String.fromEnvironment('listproductb', defaultValue: 'en-US'),
+        lang: const String.fromEnvironment('location', defaultValue: 'en-US'),
       );
 
       final LocationUpdater updater = LocationUpdater(pb);
 
       try {
         Position position = await Geolocator.getCurrentPosition(
+
           desiredAccuracy: LocationAccuracy.high,
+
         );
         await updater.updateLocation(sid, position);
       } catch (e) {
@@ -114,32 +116,27 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
   }
 
   void _getCurrentLocation() async {
-    await orderController.FetchProductsAndSupplier();
-    locations = await orderController.Datasort;
-    print(locations.length);
-    setState(() {
-      locations;
-    });
-
     bool serviceEnabled;
     LocationPermission permission;
 
     serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
-      return Future.error('Location services are disabled.');
+      print('Location services are disabled.');
+      return;
     }
 
     permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
       if (permission == LocationPermission.denied) {
-        return Future.error('Location permissions are denied');
+        print('Location permissions are denied');
+        return;
       }
     }
 
     if (permission == LocationPermission.deniedForever) {
-      return Future.error(
-          'Location permissions are permanently denied, we cannot request permissions.');
+      print('Location permissions are permanently denied, we cannot request permissions.');
+      return;
     }
 
     Position position = await Geolocator.getCurrentPosition();
