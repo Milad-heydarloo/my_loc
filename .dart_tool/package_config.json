@@ -14,6 +14,12 @@
       "languageVersion": "2.18"
     },
     {
+      "name": "auto_size_text",
+      "rootUri": "file:///Users/mac/.pub-cache/hosted/pub.dev/auto_size_text-3.0.0",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    },
+    {
       "name": "boolean_selector",
       "rootUri": "file:///Users/mac/.pub-cache/hosted/pub.dev/boolean_selector-2.1.1",
       "packageUri": "lib/",
@@ -482,7 +488,7 @@
       "languageVersion": "3.1"
     }
   ],
-  "generated": "2024-08-03T08:36:07.078396Z",
+  "generated": "2024-08-03T12:35:06.282938Z",
   "generator": "pub",
   "generatorVersion": "3.3.4"
 }

@@ -59,6 +59,7 @@ dev_dependencies:
   url_launcher: ^6.0.20
   google_maps_flutter: ^2.2.5
   maplibre_gl: ^0.20.0
+  auto_size_text: ^3.0.0
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 
