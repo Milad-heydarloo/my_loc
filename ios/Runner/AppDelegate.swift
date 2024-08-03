@@ -1,7 +1,6 @@
 import UIKit
 import Flutter
 import CoreLocation
-import LocationService
 
 @UIApplicationMain
 @objc class AppDelegate: FlutterAppDelegate {
@@ -13,7 +12,7 @@ import LocationService
   ) -> Bool {
     GeneratedPluginRegistrant.register(with: self)
 
-    // شروع به‌روزرسانی مکان
+    // Start updating location
     locationService.startUpdatingLocation()
 
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
