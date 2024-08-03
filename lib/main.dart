@@ -83,7 +83,7 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
           longitude: location.longitude.toString(),
         );
         orderController.updateLocation(updatedLocation);
-       
+
 
 
       });
