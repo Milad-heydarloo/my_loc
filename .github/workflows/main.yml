@@ -22,17 +22,17 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
-      - name: Build Release APK
+      - name: Build APK with --no-shrink
+        run: flutter build apk --no-shrink
+
+      - name: Build APK with --split-per-abi --no-shrink
+        run: flutter build apk --split-per-abi --no-shrink
+
+      - name: Build APK with --release
         run: flutter build apk --release
 
-      - name: Build Debug APK
-        run: flutter build apk --debug
-
-      - name: Build Profile APK
-        run: flutter build apk --profile
-
-      - name: Build Fat APK (universal)
-        run: flutter build apk --release --split-per-abi
+      - name: Build APK with --split-per-abi
+        run: flutter build apk --split-per-abi
 
       - name: List build directory contents
         run: ls -R build/app/outputs/apk/
@@ -43,9 +43,8 @@ jobs:
       - name: Move APKs to Release Directory
         run: |
           mv build/app/outputs/apk/release/app-release.apk release/app-release.apk
-          mv build/app/outputs/apk/debug/app-debug.apk release/app-debug.apk
-          mv build/app/outputs/apk/profile/app-profile.apk release/app-profile.apk
-          cp build/app/outputs/apk/release/*.apk release/ # Copy fat APKs
+          cp build/app/outputs/apk/no-shrink/release/*.apk release/ # Move --no-shrink APKs
+          cp build/app/outputs/apk/split-per-abi/release/*.apk release/ # Move --split-per-abi APKs
 
       - name: Upload APKs to release
         uses: svenstaro/upload-release-action@v2
@@ -54,4 +53,4 @@ jobs:
           file: release/*.apk
           tag: v1.0
           overwrite: true
-          body: "This release includes all APK builds (release, debug, profile, and fat APKs)."
+          body: "This release includes all APK builds including --no-shrink and --split-per-abi options."
