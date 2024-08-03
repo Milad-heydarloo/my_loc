@@ -7,76 +7,7 @@ import 'package:get/get.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:auto_size_text/auto_size_text.dart'; // اضافه کردن import
 
-import 'package:pocketbase/pocketbase.dart';
-import 'package:workmanager/workmanager.dart';
-
-
-
-class LocationUpdater {
-  final PocketBase _pb;
-
-  LocationUpdater(this._pb);
-
-  Future<void> updateLocation(String locationId, Position position) async {
-    try {
-      final body = <String, dynamic>{
-        "latitude": position.latitude,
-        "longitude": position.longitude,
-      };
-
-      final record = await _pb.collection('location').update(locationId, body: body);
-      if (record != null) {
-        // انجام کارهای اضافی در صورت موفقیت
-        print('Location updated successfully');
-      } else {
-        print('Failed to update location.');
-      }
-    } catch (e) {
-      print('Error: $e');
-    }
-  }
-}
-
-void main() {
-  WidgetsFlutterBinding.ensureInitialized();
-  Workmanager().initialize(callbackDispatcher);
-  runApp(const MyApp());
-}
-void callbackDispatcher() {
-  Workmanager().executeTask((task, inputData) async {
-    String sid='5imz3qage0zszam';
-    if (task == 'updateLocation') {
-      final locationId = inputData?['id'] as String?;
-      if (locationId == null) {
-        print('No location ID provided.');
-        return Future.value(false);
-      }
-
-      final PocketBase pb = PocketBase(
-        const String.fromEnvironment('order',
-            defaultValue: 'https://saater.liara.run'),
-        lang: const String.fromEnvironment('location', defaultValue: 'en-US'),
-      );
-
-      final LocationUpdater updater = LocationUpdater(pb);
-
-      try {
-        Position position = await Geolocator.getCurrentPosition(
-
-          desiredAccuracy: LocationAccuracy.high,
-
-        );
-        await updater.updateLocation(sid, position);
-      } catch (e) {
-        print('Error getting position: $e');
-      }
-    }
-    return Future.value(true);
-  });
-}
-
-
-
+void main() => runApp(const MyApp());
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -105,7 +36,6 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
 
   List<LocationSupplierModel> locations = [];
   bool _isListOpen = false;
-  bool _isTrackingEnabled = false;
 
   @override
   void initState() {
@@ -116,27 +46,32 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
   }
 
   void _getCurrentLocation() async {
+    await orderController.FetchProductsAndSupplier();
+    locations = await orderController.Datasort;
+    print(locations.length);
+    setState(() {
+      locations;
+    });
+
     bool serviceEnabled;
     LocationPermission permission;
 
     serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
-      print('Location services are disabled.');
-      return;
+      return Future.error('Location services are disabled.');
     }
 
     permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
       if (permission == LocationPermission.denied) {
-        print('Location permissions are denied');
-        return;
+        return Future.error('Location permissions are denied');
       }
     }
 
     if (permission == LocationPermission.deniedForever) {
-      print('Location permissions are permanently denied, we cannot request permissions.');
-      return;
+      return Future.error(
+          'Location permissions are permanently denied, we cannot request permissions.');
     }
 
     Position position = await Geolocator.getCurrentPosition();
@@ -188,26 +123,11 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
 
   late String apikey =
       'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImp0aSI6ImMzNjVkMDg2NjdmMzgxZDY1ZmI2NzU0ODcwNDJmZTQ1M2I1MzgxODEyMWY5YTE2OTIwNjFlNDY2NDA2MmNlYzE0NjZmNzIzZDEzMzk4NTk1In0.eyJhdWQiOiIyODIxMyIsImp0aSI6ImMzNjVkMDg2NjdmMzgxZDY1ZmI2NzU0ODcwNDJmZTQ1M2I1MzgxODEyMWY5YTE2OTIwNjFlNDY2NDA2MmNlYzE0NjZmNzIzZDEzMzk4NTk1IiwiaWF0IjoxNzIxOTQwODg3LCJuYmYiOjE3MjE5NDA4ODcsImV4cCI6MTcyNDUzMjg4Nywic3ViIjoiIiwic2NvcGVzIjpbImJhc2ljIl19.P-HVICCEemigM5vv_lYuxVogPRp3_Tpa1-6zJWONRJ9BfsWXKd4B6FPgnxmJg1wkSGOXc_GFFoeZuFrf9nRfJzwdofkbFbI9yrtWWMATW2PIY8zjd_2SoZ4O94HE-AfyPOO4Dq_V7TJV1xiGinIJdyFCCfMBAuxN-2p8etP5UF2R6r9gDqxXpeVXiHbDx2zB9nTpONG_rlCi26SJ4Y63rDhsAOppdW6v0bP8bF7wkcOJ_z2lwzaWpcOnvJ0uP0cnYc_y9MiINw_P0g79MWMV-ntFNaaj_LU5G_kvSb9y0uWbmFrPgLoEgRFkdkRK2OEAORd9b5ux_iJGnkYV39UHPQ';
-
+  bool _isTrackingEnabled = false;
   void _toggleTracking() {
     setState(() {
       _isTrackingEnabled = !_isTrackingEnabled;
     });
-
-    if (_isTrackingEnabled) {
-      Workmanager().registerPeriodicTask(
-        'location_update_task',
-        'updateLocation',
-        frequency: Duration(minutes: 15),
-        constraints: Constraints(
-          networkType: NetworkType.not_required,
-          requiresBatteryNotLow: true,
-          requiresCharging: false,
-        ),
-      );
-    } else {
-      Workmanager().cancelAll();
-    }
   }
 
   void _startLocationUpdates() {
@@ -218,12 +138,12 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
       ),
     ).listen((Position position) {
       setState(() {
+
         Location location = Location(
             id: '5imz3qage0zszam',
             user: 'ashi',
             latitude: position.latitude.toString(),
-            longitude: position.longitude.toString()
-        );
+            longitude: position.longitude.toString());
         orderController.updateLocation(location);
         _currentPosition = position;
         if (_isTrackingEnabled) {
@@ -232,7 +152,9 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
             _zoom,
           );
         }
-      });
+      }
+
+      );
       print("Updated location: ${position.latitude}, ${position.longitude}");
     });
   }
@@ -297,6 +219,7 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
                               .any((product) => product.hurry);
                           return Marker(
                             width: calculateTextWidth(locationModel.companyname+'نام مجموعه : ') + 55,
+
                             height: 150,
                             point: locationModel.position,
                             child: GestureDetector(
@@ -644,17 +567,15 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
       ),
     );
   }
-
   double calculateTextWidth(String text) {
     final TextPainter textPainter = TextPainter(
-      text: TextSpan(text: text, style: TextStyle(fontSize: 14)),
+      text: TextSpan(text: text, ),
       maxLines: 1,
       textDirection: TextDirection.rtl,
     )..layout(minWidth: 0, maxWidth: double.infinity);
 
     return textPainter.size.width;
   }
-
   void _makePhoneCall(String phoneNumber) async {
     final Uri launchUri = Uri(
       scheme: 'tel',
