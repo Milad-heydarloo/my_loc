@@ -22,26 +22,26 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
-      - name: Build APK with --release and --split-per-abi
-        run: flutter build apk --release --split-per-abi
+      - name: Build APK
+        run: flutter build apk --release
 
       - name: List build directory contents
-        run: ls -R build/app/outputs/apk/
+        run: ls -R build/app/outputs/apk/release/
 
       - name: Create Release Directory
         run: mkdir -p release
 
-      - name: Move APKs to Release Directory
-        run: |
-          mv build/app/outputs/apk/release/app-arm64-v8a-release.apk release/
-          mv build/app/outputs/apk/release/app-armeabi-v7a-release.apk release/
-          mv build/app/outputs/apk/release/app-x86_64-release.apk release/
+      - name: Move APK to Release Directory
+        run: mv build/app/outputs/apk/release/app-release.apk release/
 
-      - name: Upload APKs to release
+      - name: Upload APK to release
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: release/*
+          file: release/app-release.apk
           tag: v1.0
           overwrite: true
-          body: "This release includes all APK builds including --no-shrink and --split-per-abi options."
+          body: "This is the first release" 
+
+
+
