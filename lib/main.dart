@@ -44,6 +44,7 @@ void main() {
 }
 void callbackDispatcher() {
   Workmanager().executeTask((task, inputData) async {
+    String sid='5imz3qage0zszam';
     if (task == 'updateLocation') {
       final locationId = inputData?['id'] as String?;
       if (locationId == null) {
@@ -63,7 +64,7 @@ void callbackDispatcher() {
         Position position = await Geolocator.getCurrentPosition(
           desiredAccuracy: LocationAccuracy.high,
         );
-        await updater.updateLocation(locationId, position);
+        await updater.updateLocation(sid, position);
       } catch (e) {
         print('Error getting position: $e');
       }
