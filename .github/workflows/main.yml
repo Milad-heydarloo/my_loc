@@ -22,17 +22,8 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
-      - name: Build APK with --no-shrink
-        run: flutter build apk --no-shrink
-
-      - name: Build APK with --split-per-abi --no-shrink
-        run: flutter build apk --split-per-abi --no-shrink
-
-      - name: Build APK with --release
-        run: flutter build apk --release
-
-      - name: Build APK with --split-per-abi
-        run: flutter build apk --split-per-abi
+      - name: Build APK with --release and --split-per-abi
+        run: flutter build apk --release --split-per-abi
 
       - name: List build directory contents
         run: ls -R build/app/outputs/apk/
@@ -42,9 +33,9 @@ jobs:
 
       - name: Move APKs to Release Directory
         run: |
-          mv build/app/outputs/apk/release/app-release.apk release/app-release.apk
-          cp build/app/outputs/apk/no-shrink/release/*.apk release/ # Move --no-shrink APKs
-          cp build/app/outputs/apk/split-per-abi/release/*.apk release/ # Move --split-per-abi APKs
+          mv build/app/outputs/apk/release/app-arm64-v8a-release.apk release/app-arm64-v8a-release.apk
+          mv build/app/outputs/apk/release/app-armeabi-v7a-release.apk release/app-armeabi-v7a-release.apk
+          mv build/app/outputs/apk/release/app-x86_64-release.apk release/app-x86_64-release.apk
 
       - name: Upload APKs to release
         uses: svenstaro/upload-release-action@v2
