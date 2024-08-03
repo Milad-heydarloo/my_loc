@@ -1,9 +1,16 @@
 # This is a generated file; do not edit or check into version control.
+flutter_plugin_android_lifecycle=/Users/mac/.pub-cache/hosted/pub.dev/flutter_plugin_android_lifecycle-2.0.18/
 geolocator=/Users/mac/.pub-cache/hosted/pub.dev/geolocator-10.1.1/
-geolocator_android=/Users/mac/.pub-cache/hosted/pub.dev/geolocator_android-4.4.1/
+geolocator_android=/Users/mac/.pub-cache/hosted/pub.dev/geolocator_android-4.3.1/
 geolocator_apple=/Users/mac/.pub-cache/hosted/pub.dev/geolocator_apple-2.3.7/
 geolocator_web=/Users/mac/.pub-cache/hosted/pub.dev/geolocator_web-2.2.1/
 geolocator_windows=/Users/mac/.pub-cache/hosted/pub.dev/geolocator_windows-0.2.3/
+google_maps_flutter=/Users/mac/.pub-cache/hosted/pub.dev/google_maps_flutter-2.5.3/
+google_maps_flutter_android=/Users/mac/.pub-cache/hosted/pub.dev/google_maps_flutter_android-2.8.0/
+google_maps_flutter_ios=/Users/mac/.pub-cache/hosted/pub.dev/google_maps_flutter_ios-2.3.6/
+google_maps_flutter_web=/Users/mac/.pub-cache/hosted/pub.dev/google_maps_flutter_web-0.5.4+3/
+maplibre_gl=/Users/mac/.pub-cache/hosted/pub.dev/maplibre_gl-0.20.0/
+maplibre_gl_web=/Users/mac/.pub-cache/hosted/pub.dev/maplibre_gl_web-0.20.0/
 url_launcher=/Users/mac/.pub-cache/hosted/pub.dev/url_launcher-6.2.4/
 url_launcher_android=/Users/mac/.pub-cache/hosted/pub.dev/url_launcher_android-6.3.0/
 url_launcher_ios=/Users/mac/.pub-cache/hosted/pub.dev/url_launcher_ios-6.2.4/
