@@ -1,6 +1,7 @@
 import UIKit
 import Flutter
 import CoreLocation
+import LocationService
 
 @UIApplicationMain
 @objc class AppDelegate: FlutterAppDelegate {
