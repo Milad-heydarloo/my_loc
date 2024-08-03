@@ -2,10 +2,14 @@
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>   
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+
     <application
         android:label="biofpo_loc"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
+        <meta-data
+            android:name="androidx.work.WorkManagerInitializer"
+            android:value="androidx.work.impl.WorkManagerInitializer" />
         <activity
             android:name=".MainActivity"
             android:exported="true"
