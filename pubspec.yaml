@@ -61,6 +61,7 @@ dev_dependencies:
   maplibre_gl: ^0.20.0
   auto_size_text: ^3.0.0
   workmanager: ^0.5.0
+  background_location: ^0.13.0
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 

@@ -6,6 +6,8 @@ import 'package:latlong2/latlong.dart';
 import 'package:get/get.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:auto_size_text/auto_size_text.dart'; // اضافه کردن import
+import 'package:background_location/background_location.dart';
+
 
 void main() => runApp(const MyApp());
 
@@ -28,6 +30,19 @@ class LocationPickerScreen extends StatefulWidget {
 }
 
 class _LocationPickerScreenState extends State<LocationPickerScreen> {
+
+  ///////
+
+
+
+
+
+
+
+
+  ////////
+
+
   Position? _currentPosition;
   late MapController _mapController;
   double _zoom = 18;
@@ -43,7 +58,46 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
     _mapController = MapController();
     _getCurrentLocation();
     _startLocationUpdates();
+    _initializeBackgroundLocation();
   }
+
+
+
+  void _initializeBackgroundLocation() async {
+    // درخواست مجوز دسترسی به موقعیت مکانی
+    await BackgroundLocation.startLocationService();
+
+    // تنظیمات مربوط به دقت و فیلتر فاصله
+    BackgroundLocation.setAndroidNotification(
+      title: "Location Tracking",
+      message: "Your location is being tracked in the background",
+      icon: "@mipmap/ic_launcher",
+    );
+
+    BackgroundLocation.getLocationUpdates((location) {
+      setState(() {
+        LocationUser updatedLocation = LocationUser(
+          id: '5imz3qage0zszam',
+          user: 'ashi',
+          latitude: location.latitude.toString(),
+          longitude: location.longitude.toString(),
+        );
+        orderController.updateLocation(updatedLocation);
+       
+
+
+      });
+
+      print("Updated location: ${location.latitude}, ${location.longitude}");
+    });
+  }
+
+  @override
+  void dispose() {
+    BackgroundLocation.stopLocationService(); // توقف بروزرسانی موقعیت مکانی هنگام خروج از برنامه
+    super.dispose();
+  }
+
 
   void _getCurrentLocation() async {
     await orderController.FetchProductsAndSupplier();
@@ -139,7 +193,7 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
     ).listen((Position position) {
       setState(() {
 
-        Location location = Location(
+        LocationUser location = LocationUser(
             id: '5imz3qage0zszam',
             user: 'ashi',
             latitude: position.latitude.toString(),

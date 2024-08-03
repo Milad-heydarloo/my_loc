@@ -88,7 +88,7 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
       ),
     ).listen((Position position) {
       setState(() {
-        Location location = Location(
+        LocationUser location = LocationUser(
             id: '5imz3qage0zszam',
             user: 'ashi',
             latitude: position.latitude.toString(),

@@ -47,7 +47,7 @@ class OrderController extends GetxController {
 
   final String collectionName = 'location';
 
-  Future<void> updateLocation(Location location) async {
+  Future<void> updateLocation(LocationUser location) async {
     try {
       final body = <String, dynamic>{
         "latitude": location.latitude,
@@ -292,22 +292,22 @@ update(['products']);
 
 /////////////////////////////////////////////////
 
-class Location {
+class LocationUser {
   final String id;
   final String user;
   final String latitude;
   final String longitude;
 
-  Location({
+  LocationUser({
     required this.id,
     required this.user,
     required this.latitude,
     required this.longitude,
   });
 
-  factory Location.fromJson(Map<String, dynamic> json, List<Location> productsA,
+  factory LocationUser.fromJson(Map<String, dynamic> json, List<LocationUser> productsA,
       List<ProductB> productsB) {
-    return Location(
+    return LocationUser(
       id: json['id'].toString(),
       user: json['user'].toString(),
       latitude: json['latitude'].toString(),
